@@ -3,19 +3,19 @@
 	"modList": [{
 		"modid": "${modId}",
 		"name": "${modName}",
-		"description": "An example mod for Minecraft 1.7.10 with Forge focused on a stable setup.",
+		"description": "EU Expansion extends IndustrialCraft 2 with high-performance machines and utilities, featuring the Crop Growth Chamber, Tesseract, Vacuum Hopper, Combustion Generator, Multi-Tap Transformer, and Carbon Nano Boots.",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
-		"url": "https://github.com/SinTh0r4s/MyMod",
+		"url": "",
 		"updateUrl": "",
-		"authorList": ["SinTho0r4s"],
-		"credits": "",
+		"authorList": ["watsonad2000"],
+		"credits": "Created by watsonad2000. Special thanks to the IndustrialCraft 2 team.",
 		"logoFile": "",
 		"screenshots": [],
 		"parent": "",
-		"requiredMods": [],
-		"dependencies": [],
+		"requiredMods": ["IC2"],
+		"dependencies": ["IC2"],
 		"dependants": [],
-		"useDependencyInformation": false
+		"useDependencyInformation": true
 	}]
 }

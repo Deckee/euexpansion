@@ -13,6 +13,18 @@ public class GuiHandler implements IGuiHandler {
         if (tileEntity instanceof TileEntityTesseract) {
             return new ContainerTesseract(player.inventory, (TileEntityTesseract) tileEntity);
         }
+        if (tileEntity instanceof TileEntityVacuumHopper) {
+            return new ContainerVacuumHopper(player.inventory, (TileEntityVacuumHopper) tileEntity);
+        }
+        if (tileEntity instanceof TileEntityInductionMacerator) {
+            return new ContainerInductionMacerator(player, (TileEntityInductionMacerator) tileEntity);
+        }
+        if (tileEntity instanceof TileEntityCombustionGenerator) {
+            return new ContainerCombustionGenerator(player, (TileEntityCombustionGenerator) tileEntity);
+        }
+        if (tileEntity instanceof TileEntityCropGrower) {
+            return new ContainerCropGrower(player, (TileEntityCropGrower) tileEntity);
+        }
         return null;
     }
 

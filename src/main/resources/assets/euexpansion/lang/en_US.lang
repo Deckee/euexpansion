@@ -1,4 +1,98 @@
 itemGroup.tabEUExpansion=EU Expansion
 tile.tesseract.name=Tesseract
+tile.vacuumHopper.name=Vacuum Hopper
+tile.inductionMacerator.name=Induction Macerator
+tile.combustionGenerator.name=Combustion Generator
+tile.multiTapTransformer.name=Multi-Tap Transformer
+item.carbonNanoBoots.name=Carbon Nano Boots
+
+euexpansion.multiTapTransformer.desc.len=8
+euexpansion.multiTapTransformer.desc.0=HV/EV step-down transformer.
+euexpansion.multiTapTransformer.desc.1=Input: 5-dot face (accepts
+euexpansion.multiTapTransformer.desc.2=voltages up to 2048 EU/t).
+euexpansion.multiTapTransformer.desc.3=Outputs: Other 5 faces.
+euexpansion.multiTapTransformer.desc.4=Outputs dynamically adjust
+euexpansion.multiTapTransformer.desc.5=to the max capacity of the
+euexpansion.multiTapTransformer.desc.6=connected cable or machine.
+euexpansion.multiTapTransformer.desc.7=Wrench to rotate / dismantle.
+
+euexpansion.tesseract.desc.len=9
+euexpansion.tesseract.desc.0=Allows wireless
+euexpansion.tesseract.desc.1=transmission of EU
+euexpansion.tesseract.desc.2=power across dimensions
+euexpansion.tesseract.desc.3=on 64 channels.
+euexpansion.tesseract.desc.4=Tier can be increased
+euexpansion.tesseract.desc.5=with Transformer
+euexpansion.tesseract.desc.6=upgrades.
+euexpansion.tesseract.desc.7=Requires coolant cells
+euexpansion.tesseract.desc.8=to prevent explosions.
+
+euexpansion.vacuumHopper.desc.len=9
+euexpansion.vacuumHopper.desc.0=Collects items within
+euexpansion.vacuumHopper.desc.1=range and stores them
+euexpansion.vacuumHopper.desc.2=in its inventory.
+euexpansion.vacuumHopper.desc.3=Range can be increased
+euexpansion.vacuumHopper.desc.4=using Overclocker
+euexpansion.vacuumHopper.desc.5=upgrades.
+euexpansion.vacuumHopper.desc.6=Max voltage can be
+euexpansion.vacuumHopper.desc.7=increased using
+euexpansion.vacuumHopper.desc.8=Transformer upgrades.
+
+euexpansion.carbonNanoBoots.desc.len=7
+euexpansion.carbonNanoBoots.desc.0=Tier 3 (HV) armor.
+euexpansion.carbonNanoBoots.desc.1=Provides configurable
+euexpansion.carbonNanoBoots.desc.2=walk speed boost,
+euexpansion.carbonNanoBoots.desc.3=step-assist, and
+euexpansion.carbonNanoBoots.desc.4=high jump (1.75 blocks).
+euexpansion.carbonNanoBoots.desc.5=Absorbs fall damage
+euexpansion.carbonNanoBoots.desc.6=using stored energy.
+
+euexpansion.inductionMacerator.desc.len=6
+euexpansion.inductionMacerator.desc.0=Processes two items
+euexpansion.inductionMacerator.desc.1=per cycle at high speed.
+euexpansion.inductionMacerator.desc.2=Features a heat buffer
+euexpansion.inductionMacerator.desc.3=that must fill before it
+euexpansion.inductionMacerator.desc.4=reaches full efficiency.
+euexpansion.inductionMacerator.desc.5=Upgradable.
+
+euexpansion.combustionGenerator.desc.len=8
+euexpansion.combustionGenerator.desc.0=Generates 128 EU/t (MV).
+euexpansion.combustionGenerator.desc.1=Consumes gunpowder and TNT.
+euexpansion.combustionGenerator.desc.2=TNT lasts 5x longer than
+euexpansion.combustionGenerator.desc.3=gunpowder.
+euexpansion.combustionGenerator.desc.4=WARNING: Deals periodic
+euexpansion.combustionGenerator.desc.5=explosion damage to nearby
+euexpansion.combustionGenerator.desc.6=entities when active!
+euexpansion.combustionGenerator.desc.7=Does not damage blocks.
+
+tile.cropGrower.name=Crop Growth Chamber
+
+euexpansion.cropGrower.desc.len=8
+euexpansion.cropGrower.desc.0=Grows various crops using EU,
+euexpansion.cropGrower.desc.1=water, and a soil medium block.
+euexpansion.cropGrower.desc.2=Needs sand for sugarcane/cacti;
+euexpansion.cropGrower.desc.3=needs soul sand for nether wart;
+euexpansion.cropGrower.desc.4=needs dirt/grass for other crops.
+euexpansion.cropGrower.desc.5=Supplying Heat Units (HU) via an
+euexpansion.cropGrower.desc.6=adjacent heat source allows growing
+euexpansion.cropGrower.desc.7=warm plants and boosts normal ones.
+
+tile.thermalGenerator.name=Thermal Electric Generator
+
+euexpansion.thermalGenerator.desc.len=9
+euexpansion.thermalGenerator.desc.0=Generates EU from temperature
+euexpansion.thermalGenerator.desc.1=differences between 2 sides.
+euexpansion.thermalGenerator.desc.2=Lava + Water generates 16 EU/t,
+euexpansion.thermalGenerator.desc.3=but evaporates water and turns
+euexpansion.thermalGenerator.desc.4=lava to cobblestone after 30m.
+euexpansion.thermalGenerator.desc.5=Uranium block lasts 4h as a
+euexpansion.thermalGenerator.desc.6=heat source, then decays to lead.
+euexpansion.thermalGenerator.desc.7=Metal blocks can cool (Silver
+euexpansion.thermalGenerator.desc.8=is best, Lead is worst).
+
+item.tesseractKey.name=Tesseract Key
+item.electricMultiTool.name=Electric Multi-Tool
+
+
 
 

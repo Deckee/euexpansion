@@ -19,6 +19,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
 
     public ItemStack[] inventory = new ItemStack[9]; // 0,1,2 = Crystals; 3,4,5 = Upgrades; 6,7,8 = Cooling
     public int channel = 0;
+    public String channelStr = "0";
     public int mode = 2; // Forced to 2 (BOTH) to follow IC2 standards
     public double storedEnergy = 0.0;
     public double maxEnergy = 0.0;
@@ -175,7 +176,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         if (worldObj != null && worldObj.isRemote) {
             return clientEfficiency;
         }
-        return TesseractNetwork.getNetworkEfficiency(channel);
+        return TesseractNetwork.getNetworkEfficiency(channelStr);
     }
 
     public int getTier() {
@@ -339,6 +340,30 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
                 markDirty();
             }
             
+            // 7. Zap nearby players if efficiency is 40% or less and transferring energy
+            if (transferred > 0.0 && efficiency <= 0.40f) {
+                if (worldObj.rand.nextInt(20) == 0) { // Once per second on average
+                    double range = 4.0D;
+                    net.minecraft.util.AxisAlignedBB aabb = net.minecraft.util.AxisAlignedBB.getBoundingBox(
+                        xCoord - range, yCoord - range, zCoord - range,
+                        xCoord + range + 1, yCoord + range + 1, zCoord + range + 1
+                    );
+                    @SuppressWarnings("unchecked")
+                    java.util.List<net.minecraft.entity.player.EntityPlayer> players = 
+                        worldObj.getEntitiesWithinAABB(net.minecraft.entity.player.EntityPlayer.class, aabb);
+                    
+                    for (net.minecraft.entity.player.EntityPlayer player : players) {
+                        double distSq = player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D);
+                        if (distSq <= range * range) {
+                            player.attackEntityFrom(net.minecraft.util.DamageSource.magic, 2.0F);
+                            worldObj.playSoundEffect(player.posX, player.posY, player.posZ, "random.fizz", 1.0F, 0.6F + worldObj.rand.nextFloat() * 0.3F);
+                            // Spawn electric spark particles (potion effect ID 8198: swiftness/light blue)
+                            worldObj.playAuxSFX(2002, (int)Math.round(player.posX), (int)Math.round(player.posY), (int)Math.round(player.posZ), 8198);
+                        }
+                    }
+                }
+            }
+
             // Check if hull has overheated and explodes
             if (hullHeat >= 10000.0) {
                 if (Config.explodeOnOverheat) {
@@ -411,13 +436,18 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         double remainingLimit = maxVoltage - energyInjectedThisTick;
         if (remainingLimit <= 0) return 0.0;
 
-        double max = TesseractNetwork.getMaxEnergy(channel);
-        double stored = TesseractNetwork.getStoredEnergy(channel);
+        double max = TesseractNetwork.getMaxEnergy(channelStr);
+        double stored = TesseractNetwork.getStoredEnergy(channelStr);
         double needed = max - stored;
         if (needed <= 0) return 0.0;
 
         double efficiency = getEfficiency();
         double demanded = needed / efficiency;
+
+        // Prevent energy waste: only demand energy if the network can accept at least a full packet
+        if (demanded < maxVoltage) {
+            return 0.0;
+        }
 
         return Math.min(remainingLimit, demanded);
     }
@@ -443,7 +473,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         double efficiency = getEfficiency();
         double actualToInject = toInject * efficiency;
 
-        double rejected = TesseractNetwork.injectEnergy(channel, actualToInject, voltage);
+        double rejected = TesseractNetwork.injectEnergy(channelStr, actualToInject, voltage);
         double actualInjected = actualToInject - rejected;
 
         double injectedRaw = actualInjected / efficiency;
@@ -466,7 +496,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         double remainingLimit = maxVoltage - energyDrawnThisTick;
         if (remainingLimit <= 0) return 0.0;
 
-        double networkStored = TesseractNetwork.getStoredEnergy(channel);
+        double networkStored = TesseractNetwork.getStoredEnergy(channelStr);
         double efficiency = getEfficiency();
         double offeredFromNetwork = networkStored * efficiency;
         
@@ -484,7 +514,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         double efficiency = getEfficiency();
         double networkDraw = toDraw / efficiency;
         
-        TesseractNetwork.drawEnergy(channel, networkDraw);
+        TesseractNetwork.drawEnergy(channelStr, networkDraw);
         energyDrawnThisTick += toDraw;
     }
 
@@ -521,7 +551,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
                 stack = inventory[index];
                 inventory[index] = null;
                 markDirty();
-                TesseractNetwork.redistributeEnergy(channel);
+                TesseractNetwork.redistributeEnergy(channelStr);
                 return stack;
             } else {
                 stack = inventory[index].splitStack(count);
@@ -529,7 +559,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
                     inventory[index] = null;
                 }
                 markDirty();
-                TesseractNetwork.redistributeEnergy(channel);
+                TesseractNetwork.redistributeEnergy(channelStr);
                 return stack;
             }
         }
@@ -541,7 +571,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
         if (inventory[index] != null) {
             ItemStack stack = inventory[index];
             inventory[index] = null;
-            TesseractNetwork.redistributeEnergy(channel);
+            TesseractNetwork.redistributeEnergy(channelStr);
             return stack;
         }
         return null;
@@ -557,7 +587,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
             coolantDamageAccumulator[index - 6] = 0.0;
         }
         markDirty();
-        TesseractNetwork.redistributeEnergy(channel);
+        TesseractNetwork.redistributeEnergy(channelStr);
     }
 
     @Override
@@ -604,7 +634,21 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        this.channel = Math.min(63, Math.max(0, tag.getInteger("channel")));
+        if (tag.hasKey("channelStr")) {
+            this.channelStr = tag.getString("channelStr");
+            if (this.channelStr.contains("#")) {
+                this.channel = -1;
+            } else {
+                try {
+                    this.channel = Integer.parseInt(this.channelStr);
+                } catch (NumberFormatException e) {
+                    this.channel = 0;
+                }
+            }
+        } else {
+            this.channel = Math.min(63, Math.max(0, tag.getInteger("channel")));
+            this.channelStr = String.valueOf(this.channel);
+        }
         this.mode = 2; // Forced to 2 (BOTH) to follow IC2 standards
         this.hullHeat = tag.getDouble("hullHeat");
         
@@ -623,6 +667,7 @@ public class TileEntityTesseract extends TileEntity implements IEnergySink, IEne
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
         tag.setInteger("channel", this.channel);
+        tag.setString("channelStr", this.channelStr);
         tag.setInteger("mode", this.mode);
         tag.setDouble("hullHeat", this.hullHeat);
 

@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class GuiTesseract extends GuiContainer {
 
-    private static final ResourceLocation texture = new ResourceLocation("textures/gui/container/dispenser.png");
+    private static final ResourceLocation texture = new ResourceLocation(EUExpansion.MODID, "textures/gui/tesseract_gui.png");
     private final TileEntityTesseract tileTesseract;
 
     public GuiTesseract(InventoryPlayer playerInventory, TileEntityTesseract tileTesseract) {
@@ -24,10 +24,10 @@ public class GuiTesseract extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        this.buttonList.add(new GuiButton(0, this.guiLeft + 122, this.guiTop + 14, 20, 20, "-"));
-        this.buttonList.add(new GuiButton(1, this.guiLeft + 147, this.guiTop + 14, 20, 20, "+"));
-        this.buttonList.add(new GuiButton(2, this.guiLeft + 122, this.guiTop + 36, 20, 20, "<<"));
-        this.buttonList.add(new GuiButton(3, this.guiLeft + 147, this.guiTop + 36, 20, 20, ">>"));
+        this.buttonList.add(new GuiButton(0, this.guiLeft + 125, this.guiTop + 14, 18, 20, "-"));
+        this.buttonList.add(new GuiButton(1, this.guiLeft + 147, this.guiTop + 14, 18, 20, "+"));
+        this.buttonList.add(new GuiButton(2, this.guiLeft + 125, this.guiTop + 36, 18, 20, "<<"));
+        this.buttonList.add(new GuiButton(3, this.guiLeft + 147, this.guiTop + 36, 18, 20, ">>"));
     }
 
     @Override
@@ -42,8 +42,13 @@ public class GuiTesseract extends GuiContainer {
         this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
 
         // Draw channel text
-        String channelText = "CH: " + Math.min(63, Math.max(0, this.tileTesseract.channel));
-        this.fontRendererObj.drawString(channelText, 8, 20, 4210752);
+        String channelText;
+        if (this.tileTesseract.channel == -1) {
+            channelText = "CH: PRV";
+        } else {
+            channelText = "CH: " + Math.min(63, Math.max(0, this.tileTesseract.channel));
+        }
+        this.fontRendererObj.drawString(channelText, 12, 20, 4210752);
 
         // Draw energy text
         String energyText = "EU: " + (int) this.tileTesseract.storedEnergy;
@@ -51,10 +56,10 @@ public class GuiTesseract extends GuiContainer {
 
         GL11.glPushMatrix();
         GL11.glScalef(0.75f, 0.75f, 1.0f);
-        // Math Correction: Target X=8, Y=36 -> Divided by 0.75 = X=11, Y=48
-        this.fontRendererObj.drawString(energyText, 11, 48, 4210752);
-        // Math Correction: Target X=8, Y=46 -> Divided by 0.75 = X=11, Y=61
-        this.fontRendererObj.drawString(maxText, 11, 61, 4210752);
+        // Math Correction: Target X=12, Y=36 -> Divided by 0.75 = X=16, Y=48
+        this.fontRendererObj.drawString(energyText, 16, 48, 4210752);
+        // Math Correction: Target X=12, Y=46 -> Divided by 0.75 = X=16, Y=61
+        this.fontRendererObj.drawString(maxText, 16, 61, 4210752);
         GL11.glPopMatrix();
 
         // Draw efficiency text
@@ -76,5 +81,25 @@ public class GuiTesseract extends GuiContainer {
         int k = (this.width - this.xSize) / 2;
         int l = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
+
+        // Draw custom modern energy bar (horizontal battery style)
+        int barX = k + 12;
+        int barY = l + 54;
+        int barWidth = 40;
+        int barHeight = 8;
+
+        // Draw border (dark grey)
+        this.drawGradientRect(barX, barY, barX + barWidth, barY + barHeight, 0xFF555555, 0xFF555555);
+        // Draw background (very dark grey/black)
+        this.drawGradientRect(barX + 1, barY + 1, barX + barWidth - 1, barY + barHeight - 1, 0xFF1E1E1E, 0xFF1E1E1E);
+
+        // Calculate and draw filled portion
+        double pct = this.tileTesseract.maxEnergy > 0.0 ? this.tileTesseract.storedEnergy / this.tileTesseract.maxEnergy : 0.0;
+        pct = Math.min(1.0, Math.max(0.0, pct));
+        int filledWidth = (int) (pct * (barWidth - 2));
+        if (filledWidth > 0) {
+            // Shaded red-to-dark-red gradient to match IC2 battery colors
+            this.drawGradientRect(barX + 1, barY + 1, barX + 1 + filledWidth, barY + barHeight - 1, 0xFFFF3333, 0xFF990000);
+        }
     }
 }

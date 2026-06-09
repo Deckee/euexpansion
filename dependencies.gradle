@@ -34,8 +34,9 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.69-GTNH:dev")
+    devOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.69-GTNH:dev")
 // Automatically pulls IC2 (Experimental for 1.7.10) into your development environment
     implementation "curse.maven:ic2-242638:2353971"
+    devOnlyNonPublishable(rfg.deobf(project.files("libs/Waila-1.5.10_1.7.10.jar")))
 }
 
