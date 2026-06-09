@@ -10,10 +10,14 @@ import net.minecraft.item.ItemStack;
 
 public class TesseractNetwork {
 
-    private static final Map<Integer, List<TileEntityTesseract>> channels = new HashMap<>();
+    private static final Map<String, List<TileEntityTesseract>> channels = new HashMap<>();
+
+    public static synchronized Map<String, List<TileEntityTesseract>> getChannels() {
+        return new HashMap<>(channels);
+    }
 
     public static synchronized void register(TileEntityTesseract tile) {
-        int channel = tile.channel;
+        String channel = tile.channelStr;
         List<TileEntityTesseract> list = channels.computeIfAbsent(channel, k -> new ArrayList<>());
         if (!list.contains(tile)) {
             list.add(tile);
@@ -22,7 +26,7 @@ public class TesseractNetwork {
     }
 
     public static synchronized void unregister(TileEntityTesseract tile) {
-        int channel = tile.channel;
+        String channel = tile.channelStr;
         List<TileEntityTesseract> list = channels.get(channel);
         if (list != null) {
             list.remove(tile);
@@ -33,7 +37,7 @@ public class TesseractNetwork {
         redistributeEnergy(channel);
     }
 
-    public static synchronized void changeChannel(TileEntityTesseract tile, int oldChannel, int newChannel) {
+    public static synchronized void changeChannel(TileEntityTesseract tile, String oldChannel, String newChannel) {
         List<TileEntityTesseract> oldList = channels.get(oldChannel);
         if (oldList != null) {
             oldList.remove(tile);
@@ -49,7 +53,11 @@ public class TesseractNetwork {
         redistributeEnergy(newChannel);
     }
 
-    public static synchronized double getStoredEnergy(int channel) {
+    public static synchronized void changeChannel(TileEntityTesseract tile, int oldChannel, int newChannel) {
+        changeChannel(tile, String.valueOf(oldChannel), String.valueOf(newChannel));
+    }
+
+    public static synchronized double getStoredEnergy(String channel) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null) return 0.0;
         double total = 0.0;
@@ -64,7 +72,11 @@ public class TesseractNetwork {
         return total;
     }
 
-    public static synchronized double getMaxEnergy(int channel) {
+    public static synchronized double getStoredEnergy(int channel) {
+        return getStoredEnergy(String.valueOf(channel));
+    }
+
+    public static synchronized double getMaxEnergy(String channel) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null) return 0.0;
         double total = 0.0;
@@ -79,7 +91,11 @@ public class TesseractNetwork {
         return total;
     }
 
-    public static synchronized double injectEnergy(int channel, double amount, double voltage) {
+    public static synchronized double getMaxEnergy(int channel) {
+        return getMaxEnergy(String.valueOf(channel));
+    }
+
+    public static synchronized double injectEnergy(String channel, double amount, double voltage) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null || amount <= 0) return amount;
 
@@ -108,7 +124,11 @@ public class TesseractNetwork {
         return remaining;
     }
 
-    public static synchronized double drawEnergy(int channel, double amount) {
+    public static synchronized double injectEnergy(int channel, double amount, double voltage) {
+        return injectEnergy(String.valueOf(channel), amount, voltage);
+    }
+
+    public static synchronized double drawEnergy(String channel, double amount) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null || amount <= 0) return 0.0;
 
@@ -133,7 +153,11 @@ public class TesseractNetwork {
         return amount - remaining;
     }
 
-    public static synchronized void redistributeEnergy(int channel) {
+    public static synchronized double drawEnergy(int channel, double amount) {
+        return drawEnergy(String.valueOf(channel), amount);
+    }
+
+    public static synchronized void redistributeEnergy(String channel) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null) return;
 
@@ -182,11 +206,15 @@ public class TesseractNetwork {
         }
     }
 
+    public static synchronized void redistributeEnergy(int channel) {
+        redistributeEnergy(String.valueOf(channel));
+    }
+
     public static synchronized void clear() {
         channels.clear();
     }
 
-    public static synchronized double getNetworkEfficiency(int channel) {
+    public static synchronized double getNetworkEfficiency(String channel) {
         List<TileEntityTesseract> list = channels.get(channel);
         if (list == null || list.isEmpty()) return 0.30;
         
@@ -209,5 +237,9 @@ public class TesseractNetwork {
             }
             return sum / list.size();
         }
+    }
+
+    public static synchronized double getNetworkEfficiency(int channel) {
+        return getNetworkEfficiency(String.valueOf(channel));
     }
 }

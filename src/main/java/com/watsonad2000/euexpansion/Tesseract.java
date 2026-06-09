@@ -13,6 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class Tesseract extends Block implements ITileEntityProvider {
 
@@ -41,6 +44,46 @@ public class Tesseract extends Block implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+        ItemStack held = player.getHeldItem();
+        if (held != null && held.getItem() == EUExpansion.tesseractKey) {
+            if (!held.hasDisplayName()) {
+                if (!world.isRemote) {
+                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "You must name this key in an anvil first!"));
+                }
+                return true;
+            }
+            
+            if (!world.isRemote) {
+                TileEntity tile = world.getTileEntity(x, y, z);
+                if (tile instanceof TileEntityTesseract) {
+                    TileEntityTesseract tess = (TileEntityTesseract) tile;
+                    
+                    // Unregister old channel first
+                    TesseractNetwork.unregister(tess);
+                    
+                    // Initialize NBT for key if not present
+                    if (!held.hasTagCompound()) {
+                        held.setTagCompound(new NBTTagCompound());
+                    }
+                    if (!held.getTagCompound().hasKey("owner")) {
+                        held.getTagCompound().setString("owner", player.getCommandSenderName());
+                    }
+                    
+                    String owner = held.getTagCompound().getString("owner");
+                    tess.channelStr = owner + "#" + held.getDisplayName();
+                    tess.channel = -1;
+                    
+                    // Re-register to the new private channel
+                    TesseractNetwork.register(tess);
+                    tess.markDirty();
+                    
+                    player.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Tesseract successfully bound to private channel: " + EnumChatFormatting.YELLOW + held.getDisplayName()));
+                    world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.levelup", 1.0F, 1.0F);
+                }
+            }
+            return true;
+        }
+
         if (player.isSneaking()) {
             if (!world.isRemote) {
                 float f = world.rand.nextFloat() * 0.8F + 0.1F;

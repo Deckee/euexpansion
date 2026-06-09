@@ -116,8 +116,9 @@ public class ContainerTesseract extends Container {
             newChannel = Math.min(63, Math.max(0, newChannel));
 
             if (newChannel != oldChannel) {
-                TesseractNetwork.changeChannel(tileTesseract, oldChannel, newChannel);
+                TesseractNetwork.changeChannel(tileTesseract, tileTesseract.channelStr, String.valueOf(newChannel));
                 tileTesseract.channel = newChannel;
+                tileTesseract.channelStr = String.valueOf(newChannel);
                 tileTesseract.markDirty();
                 return true;
             }
@@ -128,8 +129,8 @@ public class ContainerTesseract extends Container {
     @Override
     public void addCraftingToCrafters(ICrafting listener) {
         super.addCraftingToCrafters(listener);
-        int stored = (int) TesseractNetwork.getStoredEnergy(tileTesseract.channel);
-        int max = (int) TesseractNetwork.getMaxEnergy(tileTesseract.channel);
+        int stored = (int) TesseractNetwork.getStoredEnergy(tileTesseract.channelStr);
+        int max = (int) TesseractNetwork.getMaxEnergy(tileTesseract.channelStr);
         
         listener.sendProgressBarUpdate(this, 0, stored & 0xFFFF);
         listener.sendProgressBarUpdate(this, 1, (stored >> 16) & 0xFFFF);
@@ -145,8 +146,8 @@ public class ContainerTesseract extends Container {
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
 
-        int stored = (int) TesseractNetwork.getStoredEnergy(tileTesseract.channel);
-        int max = (int) TesseractNetwork.getMaxEnergy(tileTesseract.channel);
+        int stored = (int) TesseractNetwork.getStoredEnergy(tileTesseract.channelStr);
+        int max = (int) TesseractNetwork.getMaxEnergy(tileTesseract.channelStr);
         int chan = tileTesseract.channel;
         int mode = tileTesseract.mode;
         int eff = (int) Math.round(tileTesseract.getEfficiency() * 1000);
@@ -197,7 +198,7 @@ public class ContainerTesseract extends Container {
         } else if (id == 3) {
             maxEnergyUpper = data & 0xFFFF;
         } else if (id == 4) {
-            this.tileTesseract.channel = Math.min(63, Math.max(0, data));
+            this.tileTesseract.channel = (data == -1) ? -1 : Math.min(63, Math.max(0, data));
         } else if (id == 5) {
             this.tileTesseract.mode = data;
         } else if (id == 6) {
